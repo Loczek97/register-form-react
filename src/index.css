@@ -7,3 +7,12 @@ body {
   font-family: Poppins, sans-serif;
   background: url('img/background.svg') no-repeat center center fixed;
 }
+
+label {
+  top: -6rem;
+}
+
+input:focus~label,
+input:valid~label {
+  top: 0;
+}
