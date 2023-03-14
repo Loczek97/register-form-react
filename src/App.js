@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
-import ValidateLogin from './components/ValidateLogin';
-import ValidateEmail from './components/ValidateEmail';
-import ValidatePasswords from './components/ValidatePasswords';
+import CustomInput from './components/CustomInput';
+import CustomCheckbox from './components/CustomCheckbox';
+import CustomButton from './components/CustomButton';
+import FormValidation from './components/FormValidation';
 import './index.css'
 
 export default class App extends Component {
@@ -13,9 +14,32 @@ export default class App extends Component {
         email: "",
         pass: "",
         pass2: "",
+        isAccepted: false,
+      },
+
+      errors: {
+        login: true,
+        email: false,
+        passwords: false,
         isAccepted: false
       }
-    };
+    }
+
+    this.messages = {
+      loginMess: {
+        incorrect: 'Login musi zawierać co najmniej 3 znaki',
+      },
+      emailMess: {
+        incorrect: 'Niepoprawny adres email',
+      },
+      passwordsMess: {
+        incorrect: 'Hasła muszą być takie same',
+      },
+      isAcceptedMess: {
+        incorrect: 'Musisz zaakceptować regulamin'
+      }
+    }
+
   }
 
 
@@ -44,16 +68,36 @@ export default class App extends Component {
 
   handleSubmit = (e) => {
     e.preventDefault()
-    const { data } = this.state
-    const loginValid = ValidateLogin(data.login)
-    const emailValid = ValidateEmail(data.email)
-    const passwordsValid = ValidatePasswords(data.pass, data.pass2)
+    const errors = FormValidation(this.state.data)
 
-    if (data.login && data.email && data.pass && data.pass2 && data.isAccepted) {
-      console.log(loginValid)
-      console.log(emailValid)
-      console.log(passwordsValid)
+    if (errors) {
+      this.setState({
+        data: {
+          login: "",
+          email: "",
+          pass: "",
+          pass2: "",
+          isAccepted: false,
+        },
+
+        errors: {
+          login: false,
+          email: false,
+          passwords: false,
+          isAccepted: false
+        }
+      })
+    } else {
+      this.setState({
+        errors: {
+          login: true,
+          email: true,
+          passwords: true,
+          isAccepted: true
+        }
+      })
     }
+
   }
 
 
@@ -61,89 +105,85 @@ export default class App extends Component {
 
   render() {
     const { login, email, pass, pass2, isAccepted } = this.state.data
-
-    const isFieldFilled = (fieldName) => {
-      return this.state.data[fieldName].length > 0;
-    };
+    const { errors } = this.state
+    const { loginMess, emailMess, passwordsMess, isAcceptedMess } = this.messages
 
     return (
 
       <div className='w-screen h-screen flex justify-center items-center box-border' >
 
         {/* Form */}
-        <form className='m-auto w-full md:w-[40%] h-[70%] backdrop-blur-sm text-white rounded-md border border-solid border-white flex flex-col justify-center items-center' onSubmit={this.handleSubmit} >
+        <form className='m-auto w-full md:w-[40%] h-[80%] backdrop-blur-sm text-white rounded-md border border-solid border-white flex flex-col justify-center items-center' onSubmit={this.handleSubmit} >
           <h1 className='text-3xl text-red-600 font-semibold hover:scale-110 transition-all duration-300 ease-in-out'>
             Zarejestruj się
           </h1>
 
           {/*login*/}
-          <div className='w-2/3 relative mt-10'>
-            <input
-              type="text"
-              className="block py-2.5 px-0 w-full bg-transparent border-0 border-b-2 border-white appearance-none focus:border-red-600 focus:outline-none peer"
-              placeholder=" "
-              name='login'
-              value={login}
-              id='login-input'
-              onChange={(e) => this.handleInputChange(e)} />
-            <label htmlFor="login-input"
-              className="absolute duration-300 transform -translate-y-6 -z-10 origin-[0] peer-focus:text-red-600 peer-placeholder-shown:translate-y-4 peer-focus:-translate-y-6">Login</label>
-          </div>
+          <CustomInput
+            type="text"
+            name='login'
+            value={login}
+            id='login-input'
+            onChange={(e) => this.handleInputChange(e)}
+            text='Login'
+            error={errors.login}
+            errorMess={loginMess}
+          />
 
 
           {/* Email */}
-          <div className='w-2/3 relative mt-10'>
-            <input
-              type="text"
-              className="block py-2.5 px-0 w-full bg-transparent border-0 border-b-2 border-white appearance-none focus:border-red-600 focus:outline-none peer"
-              placeholder=" "
-              name='email'
-              value={email}
-              id='email-input'
-              onChange={(e) => this.handleInputChange(e)} />
-            <label htmlFor="email-input"
-              className="absolute duration-300 transform -translate-y-6 -z-10 origin-[0] peer-focus:text-red-600 peer-placeholder-shown:translate-y-4 peer-focus:-translate-y-6">Email</label>
-          </div>
+          <CustomInput
+            type="text"
+            name='email'
+            value={email}
+            id='email-input'
+            onChange={(e) => this.handleInputChange(e)}
+            text='Email'
+            error={errors.email}
+            errorMess={emailMess}
+          />
 
 
           {/* Password */}
-          <div className='w-2/3 relative mt-10'>
-            <input
-              type="password"
-              className="block py-2.5 px-0 w-full bg-transparent border-0 border-b-2 border-white appearance-none focus:border-red-600 focus:outline-none peer"
-              placeholder=" "
-              name='pass'
-              value={pass}
-              id='pass-input'
-              onChange={(e) => this.handleInputChange(e)} />
-            <label htmlFor="pass-input"
-              className="absolute duration-300 transform -translate-y-6 -z-10 origin-[0] peer-focus:text-red-600 peer-placeholder-shown:translate-y-4 peer-focus:-translate-y-6">Hasło</label>
-          </div>
+          <CustomInput
+            type="password"
+            name='pass'
+            value={pass}
+            id='pass-input'
+            onChange={(e) => this.handleInputChange(e)}
+            text='Hasło'
+            error={errors.passwords}
+            errorMess={passwordsMess}
+          />
 
 
           {/* Password 2 */}
-          <div className='w-2/3 relative mt-10'>
-            <input
-              type="password"
-              className="block py-2.5 px-0 w-full bg-transparent border-0 border-b-2 border-white appearance-none focus:border-red-600 focus:outline-none peer"
-              placeholder=" "
-              name='pass2'
-              value={pass2}
-              id='pass2-input'
-              onChange={(e) => this.handleInputChange(e)} />
-            <label htmlFor="pass2-input"
-              className="absolute duration-300 transform -translate-y-6 -z-10 origin-[0] peer-focus:text-red-600 peer-placeholder-shown:translate-y-4 peer-focus:-translate-y-6">Powtórz hasło</label>
-          </div>
+          <CustomInput
+            type="password"
+            name='pass2'
+            value={pass2}
+            id='pass2-input'
+            onChange={(e) => this.handleInputChange(e)}
+            text='Powtórz hasło'
+            error={errors.passwords}
+            errorMess={passwordsMess}
+          />
 
 
           {/* Checkbox */}
-          <div className='w-2/3 mt-12'>
-            <input type="checkbox" id='isAccepted' name='isAccepted' className='mr-2 accent-red-600 background-transparent rounded' checked={isAccepted} onChange={(e) => this.handleCheckBoxChange(e)} />
-            <label htmlFor='isAccepted' className='text-left'>Akceptuję regulamin</label>
-          </div >
+
+          <CustomCheckbox
+            name='isAccepted'
+            id='isAccepted'
+            text='Akceptuję regulamin'
+            checked={isAccepted}
+            onChange={(e) => this.handleCheckBoxChange(e)}
+            error={errors.isAccepted}
+            errorMess={isAcceptedMess}
+          />
 
           {/* Submit */}
-          <button className='mt-4 w-2/3 bg-red-600 hover:bg-red-700 hover:scale-[1.02] active:scale-95 transition-color duration-300 ease-in-out rounded-md py-2 px-4 text-white'> Zarejestruj </button>
+          <CustomButton>Zarejestruj się</CustomButton>
         </form >
       </div >
     )
