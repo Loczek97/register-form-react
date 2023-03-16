@@ -1,25 +1,30 @@
 export default function FormValidation(data) {
     const errors = {}
 
-    if (data.login.length < 3 && data.login.indexOf(' ' === -1)) {
-        errors.login = true
+
+    const validateLogin = (login) => {
+        if (login.length < 3) return errors.login = true
+        if (login.indexOf(' ') !== -1) return errors.login = true
     }
 
-    if (data.email.indexOf('@') === -1 && data.email.indexOf('.') === -1) {
-        errors.email = true
+    const validateEmail = (email) => {
+        const reg = /^[0-9a-z_.-]+@[0-9a-z.-]+\.[a-z]{2,3}$/
+        if (!reg.test(email)) return errors.email = true
     }
 
-    if (data.pass.length < 6) {
-        errors.passwords = true
+    const validatePasswords = (pass, pass2) => {
+        if (pass !== pass2) return errors.passwords = true
+        if (pass.length < 6) return errors.passwords = true
     }
 
-    if (data.pass !== data.pass2) {
-        errors.passwords = true
+    const validateIsAccepted = (isAccepted) => {
+        if (!isAccepted) return errors.isAccepted = true
     }
 
-    if (!data.isAccepted) {
-        errors.isAccepted = true
-    }
+    validateLogin(data.login)
+    validateEmail(data.email)
+    validatePasswords(data.pass, data.pass2)
+    validateIsAccepted(data.isAccepted)
 
     return errors
 }

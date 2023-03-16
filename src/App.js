@@ -3,6 +3,7 @@ import CustomInput from './components/CustomInput';
 import CustomCheckbox from './components/CustomCheckbox';
 import CustomButton from './components/CustomButton';
 import FormValidation from './components/FormValidation';
+import PopupMessage from './components/PopupMessage';
 import './index.css'
 
 export default class App extends Component {
@@ -18,16 +19,18 @@ export default class App extends Component {
       },
 
       errors: {
-        login: true,
+        login: false,
         email: false,
         passwords: false,
         isAccepted: false
-      }
+      },
+
+      isFormSubmitted: false
     }
 
     this.messages = {
       loginMess: {
-        incorrect: 'Login musi zawierać co najmniej 3 znaki',
+        incorrect: 'Login musi mieć minimum 3 znaki',
       },
       emailMess: {
         incorrect: 'Niepoprawny adres email',
@@ -65,13 +68,29 @@ export default class App extends Component {
     }))
   }
 
+  handleClosePopup = () => {
+    this.setState({
+      isFormSubmitted: false
+    })
+  }
+
 
   handleSubmit = (e) => {
     e.preventDefault()
     const errors = FormValidation(this.state.data)
 
-    if (errors) {
+
+    if (errors.hasOwnProperty('login') || errors.hasOwnProperty('email') || errors.hasOwnProperty('passwords') || errors.hasOwnProperty('isAccepted')) {
+      this.setState({ errors })
+    } else {
       this.setState({
+        errors: {
+          login: false,
+          email: false,
+          passwords: false,
+          isAccepted: false
+        },
+
         data: {
           login: "",
           email: "",
@@ -80,32 +99,16 @@ export default class App extends Component {
           isAccepted: false,
         },
 
-        errors: {
-          login: false,
-          email: false,
-          passwords: false,
-          isAccepted: false
-        }
+        isFormSubmitted: true
       })
-    } else {
-      this.setState({
-        errors: {
-          login: true,
-          email: true,
-          passwords: true,
-          isAccepted: true
-        }
-      })
+
     }
-
   }
-
-
 
 
   render() {
     const { login, email, pass, pass2, isAccepted } = this.state.data
-    const { errors } = this.state
+    const { errors, isFormSubmitted } = this.state
     const { loginMess, emailMess, passwordsMess, isAcceptedMess } = this.messages
 
     return (
@@ -113,7 +116,10 @@ export default class App extends Component {
       <div className='w-screen h-screen flex justify-center items-center box-border' >
 
         {/* Form */}
-        <form className='m-auto w-full md:w-[40%] h-[80%] backdrop-blur-sm text-white rounded-md border border-solid border-white flex flex-col justify-center items-center' onSubmit={this.handleSubmit} >
+        <form className='m-auto w-full md:w-[50%] h-[80%] backdrop-blur-sm text-white rounded-md border border-solid border-white flex flex-col justify-center items-center'
+          onSubmit={this.handleSubmit}
+          autoComplete='off'
+        >
           <h1 className='text-3xl text-red-600 font-semibold hover:scale-110 transition-all duration-300 ease-in-out'>
             Zarejestruj się
           </h1>
@@ -185,6 +191,8 @@ export default class App extends Component {
           {/* Submit */}
           <CustomButton>Zarejestruj się</CustomButton>
         </form >
+        {/* Popup */}
+        {isFormSubmitted && <PopupMessage isOpen={isFormSubmitted} onClose={this.handleClosePopup} />}
       </div >
     )
   }
